@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Quest for My Sister 👑</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #c39b56;
+            --dark-gold: #9e7a41;
+            --bg-dark: #0a0a0a;
+            --pink: #ff477e;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark); color: white;
+            overflow: hidden;
+        }
+
+        /* Latar Belakang Partikel Global */
+        #particles-js {
+            position: fixed; width: 100%; height: 100%; z-index: 1;
+            background-image: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        /* Struktur Halaman (Screen) */
+        .screen {
+            position: relative; z-index: 2;
+            width: 100%; height: 100vh;
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px; box-sizing: border-box;
+        }
+
+        .active { display: flex !important; animation: fadeIn 0.8s ease forwards; }
+
+        h1.title-premium {
+            font-family: 'Cinzel', serif; color: var(--gold);
+            font-size: 2.8rem; text-shadow: 0 0 15px rgba(195, 155, 86, 0.6);
+            margin-bottom: 10px;
+        }
+
+        p.desc { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; }
+
+        /* --- SCREEN 1: PECARKAN BALON --- */
+        .balon {
+            width: 140px; height: 170px;
+            background: radial-gradient(circle at 30% 30%, var(--pink), #ff6b81);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            cursor: pointer; position: relative;
+            animation: melayang 3s ease-in-out infinite;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 10px 20px rgba(255,71,87,0.4);
+        }
+        .balon::after {
+            content: ""; position: absolute; bottom: -20px; left: 50%;
+            width: 2px; height: 20px; background-color: #fff;
+        }
+
+        /* --- SCREEN 2: TIUP LILIN & POTONG KUE --- */
+        .cake-container { position: relative; width: 200px; height: 200px; }
+        .cake {
+            width: 160px; height: 100px; background: #fa8072;
+            position: absolute; bottom: 0; left: 20px; border-radius: 10px 10px 0 0;
+            box-shadow: inset 0 10px 0 #ffb6c1, 0 5px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        .candle {
+            width: 12px; height: 40px; background: #fff;
+            position: absolute; top: 60px; left: 94px; border-radius: 3px; cursor: pointer;
+        }
+        .flame {
+            width: 16px; height: 24px; background: #ffa500;
+            position: absolute; top: 38px; left: 92px; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 10px #ffa500; animation: flicker 0.1s infinite alternate; cursor: pointer;
+        }
+        .line-cut {
+            position: absolute; width: 100%; height: 2px; background: dashed white;
+            top: 140px; left: 0; display: none; opacity: 0.7;
+        }
+        .knife-item {
+            font-size: 40px; cursor: pointer; margin-top: 20px;
+            transition: transform 0.3s; display: none;
+            animation: melayang 2s infinite alternate;
+        }
+        .knife-item.equipped {
+            transform: scale(1.3); border: 2px dashed var(--gold);
+            border-radius: 50%; padding: 5px; background: rgba(195, 155, 86, 0.2);
+        }
+
+        /* --- SCREEN 3: SURAT PREMIUM --- */
+        .envelope {
+            width: 200px; height: 140px; background: #3a3a3a;
+            border-radius: 5px; position: relative; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .envelope::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            border-left: 100px solid transparent; border-right: 100px solid transparent;
+            border-top: 80px solid #4a4a4a; transform-origin: top; transition: all 0.5s;
+        }
+        .wax-seal {
+            position: absolute; width: 40px; height: 40px; background: #8b0000;
+            border-radius: 50%; top: 60px; left: 80px; z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex;
+            align-items: center; justify-content: center; font-weight: bold; font-size: 12px;
+        }
+        .premium-letter-frame {
+            display: none; background: rgba(255, 255, 255, 0.03); 
+            border: 3px double var(--gold); outline: 1px solid rgba(195, 155, 86, 0.3); outline-offset: -10px;
+            padding: 45px; border-radius: 8px; max-width: 550px; width: 90%;
+            backdrop-filter: blur(12px); box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            margin-top: 20px; box-sizing: border-box;
+        }
+        .premium-letter-frame p { line-height: 1.8; color: #f0f0f0; font-size: 1.05rem; text-align: justify; }
+        .premium-letter-frame .signature { font-family: 'Cinzel', serif; color: var(--gold); text-align: right; margin-top: 30px; font-weight: bold; }
+        
+        .next-btn {
+            margin-top: 25px; padding: 12px 35px; background: var(--gold);
+            border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; color: var(--bg-dark); transition: all 0.3s;
+        }
+        .next-btn:hover { background: white; color: var(--bg-dark); }
+
+        /* --- SCREEN BARU: GALERI POLAROID --- */
+        .polaroid-gallery {
+            display: flex; gap: 25px; justify-content: center; align-items: center;
+            flex-wrap: wrap; margin-top: 20px; max-width: 900px;
+        }
+        .polaroid {
+            background: white; padding: 15px 15px 25px 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7); border-radius: 4px;
+            transition: transform 0.3s ease; width: 180px; text-align: center;
+        }
+        /* Efek rotasi acak polaroid biar estetik */
+        .polaroid:nth-child(1) { transform: rotate(-4deg); }
+        .polaroid:nth-child(2) { transform: rotate(2deg); }
+        .polaroid:nth-child(3) { transform: rotate(-2deg); }
+        .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 5; }
+        
+        .polaroid img {
+            width: 100%; height: 180px; object-fit: cover;
+            filter: sepia(0.2) contrast(1.1); border: 1px solid #ddd;
+        }
+        .polaroid .caption {
+            font-family: 'Arial', sans-serif; color: #333;
+            font-size: 0.9rem; margin-top: 15px; font-weight: bold;
+        }
+
+        /* --- SCREEN 4: GAME TANGKAP BOLA --- */
+        #game-canvas { border: 2px solid var(--gold); background: rgba(255,255,255,0.02); border-radius: 10px; max-width: 100%; }
+        .warning-text { color: #ff4757; font-weight: bold; font-size: 0.95rem; margin-top: -15px; margin-bottom: 20px; }
+
+        /* --- SCREEN 5: PRANK KADO --- */
+        .btn-container { margin-top: 40px; display: flex; gap: 30px; position: relative; height: 150px; width: 100%; justify-content: center; }
+        .btn-kado { padding: 15px 40px; font-size: 18px; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; height: 55px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #btn-murah { background: #2ed573; color: white; }
+        #btn-mahal { background: #ffa502; color: white; position: absolute; left: calc(50% + 20px); }
+
+        /* --- CUSTOM PREMIUM MODAL BOX (PENGGANTI ALERT) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            z-index: 999; display: none; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.05); border: 2px solid var(--gold);
+            padding: 35px; border-radius: 15px; max-width: 450px; width: 85%;
+            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            animation: fadeIn 0.4s ease;
+        }
+        .modal-box h2 { font-family: 'Cinzel', serif; color: var(--gold); margin-top: 0; }
+        .modal-box p { font-size: 1rem; color: #eee; line-height: 1.6; margin-bottom: 25px; }
+        .modal-btn {
+            padding: 10px 30px; background: var(--gold); border: none;
+            border-radius: 25px; font-weight: bold; cursor: pointer; color: var(--bg-dark);
+        }
+
+        /* Animasi Global */
+        @keyframes melayang { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.05); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <audio id="musik-ultah" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+
+    <div id="particles-js"></div>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="modal-title">Notifikasi</h2>
+            <p id="modal-desc">Isi pesan...</p>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <div id="screen-balon" class="screen active">
+        <h1 class="title-premium" data-aos="fade-down">Hey Sister! 👑</h1>
+        <p class="desc" data-aos="fade-up">Ada kiriman paket misterius buat kamu. Coba pecahkan balonnya!</p>
+        <div class="balon" onclick="actionBalon()"></div>
+    </div>
+
+    <div id="screen-kue" class="screen">
+        <h1 class="title-premium" id="kue-instruction">Make a Wish! 🎂</h1>
+        <p class="desc" id="kue-desc">Ketuk lilin untuk meniupnya!</p>
+        
+        <div class="cake-container" id="cake-box">
+            <div class="flame" id="lilin-api" onclick="tiupLilin()"></div>
+            <div class="candle" onclick="tiupLilin()"></div>
+            <div class="cake" onclick="potongKue()"></div>
+            <div class="line-cut" id="garis-potong"></div>
+        </div>
+        <div id="pisau" class="knife-item" onclick="ambilPisau()">🔪</div>
+    </div>
+
+    <div id="screen-surat" class="screen">
+        <h1 class="title-premium">A Letter For You ✨</h1>
+        
+        <div class="envelope" id="amplop" onclick="actionSurat()">
+            <div class="wax-seal" id="segel">HBD</div>
+        </div>
+
+        <div class="premium-letter-frame" id="kotak-surat">
+            <p><b>Selamat Ulang Tahun, My Sister Azul! 🎉</b></p>
+            <p>Di hari spesial ini, adek mu ini hanya bisa mendoakan supaya kamu selalu bahagia, sehat, dan dilancarkan segala urusannya, di mudahkan jodohnya, di mudahkan rezekinya biar kayaaaaa Rayaaaaa.!</p>
+            <p>Tetap jadi diri sendiri, kejar satu persatu segala impiannya, dan jangan bosan-bosan jadi saudaraku yang di ajak curhat wkwk. <i>Wish you all the best!</i> ❤️</p>
+            <div class="signature">- Dari Saudarimu Yang Cantik ~ Isti</div>
+            <center><button class="next-btn" onclick="goToGallery()">Buka Kado Lain 👉</button></center>
+        </div>
+    </div>
+
+    <div id="screen-galeri" class="screen">
+        <h1 class="title-premium">Pokoknya Happy Birthday 📸</h1>
+        <p class="desc">Annisa Azzulia Mantan Pacar Cho Kyuhyun ceunah!</p>
+        
+        <div class="polaroid-gallery">
+            <div class="polaroid">
+                <img src="foto1.jpg" alt="Memori 1">
+                <div class="caption"></div>
+            </div>
+            <div class="polaroid">
+                <img src="foto2.jpg" alt="Memori 2">
+                <div class="caption"></div>
+            </div>
+            <div class="polaroid">
+                <img src="foto3.jpg" alt="Memori 3">
+                <div class="caption"></div>
+            </div>
+        </div>
+        
+        <center><button class="next-btn" onclick="goToGame()">Lanjut Ambil Kado 👉</button></center>
+    </div>
+
+    <div id="screen-game" class="screen">
+        <h1 class="title-premium">Sebelum Ambil Kado Main Ini Dulu 🍓</h1>
+        <p class="desc">Kumpulkan Skor sampai <b>10</b> untuk klaim kadomu! (Gunakan Mouse / Geser Layar)</p>
+        <p class="warning-text">⚠️ AWAS: Jangan tangkap bola MERAH, skor kamu bisa berkurang -2!</p>
+        <h3 style="color: var(--gold); margin-bottom: 10px;">Skor: <span id="skor-txt">0</span> / 10</h3>
+        <canvas id="game-canvas" width="400" height="400"></canvas>
+    </div>
+
+    <div id="screen-kado" class="screen">
+        <h1 class="title-premium">YEAY SILAHKAN AMBIL KADO 💎</h1>
+        <p class="desc">Selamat kamu lulus ujian! Sekarang, silakan pilih kado yang kamu mau:</p>
+        <div class="btn-container">
+            <button id="btn-murah" class="btn-kado" onclick="actionAkhir()">Kado Murah Aja 🎁</button>
+            <button id="btn-mahal" class="btn-kado" onmouseover="kabur()" onclick="kabur()">Kado Paling Mahal 💎</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <script>
+        AOS.init({ once: true });
+        
+        // Partikel Premium Latar Belakang
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#c39b56" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.4, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": false },
+                "move": { "enable": true, "speed": 1.5, "direction": "bottom", "out_mode": "out" }
+            }
+        });
+
+        const musik = document.getElementById('musik-ultah');
+        
+        // Fungsi Pemicu Modal Custom (Pengganti Alert)
+        let modalCallback = null;
+        function tampilkanModal(title, desc, callback = null) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerHTML = desc;
+            document.getElementById('custom-modal').style.display = 'flex';
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+            if (modalCallback) {
+                modalCallback();
+                modalCallback = null;
+            }
+        }
+
+        function changeScreen(currentId, nextId) {
+            document.getElementById(currentId).classList.remove('active');
+            document.getElementById(nextId).classList.add('active');
+        }
+
+        // --- SCREEN 1 ---
+        function actionBalon() {
+            musik.play().catch(() => console.log("Audio playing"));
+            changeScreen('screen-balon', 'screen-kue');
+        }
+
+        // --- SCREEN 2 ---
+        let punyaPisau = false; let lilinMati = false;
+        function tiupLilin() {
+            if(!lilinMati) {
+                document.getElementById('lilin-api').style.display = 'none';
+                document.getElementById('kue-instruction').innerText = "Ambil Pisaunya! 🔪";
+                document.getElementById('kue-desc').innerText = "Klik ikon pisau di bawah untuk memotong kue";
+                document.getElementById('pisau').style.display = 'block';
+                lilinMati = true;
+            }
+        }
+        function ambilPisau() {
+            if(lilinMati && !punyaPisau) {
+                punyaPisau = true;
+                document.getElementById('pisau').classList.add('equipped');
+                document.getElementById('kue-instruction').innerText = "Potong Kuenya! 🍰";
+                document.getElementById('kue-desc').innerText = "Sekarang klik pada bagian kue untuk memotongnya";
+                document.getElementById('garis-potong').style.display = 'block';
+            }
+        }
+        function potongKue() {
+            if(!lilinMati) { tampilkanModal("Oops!", "Tiup dulu lilinnya dong sis! Hahaha"); return; }
+            if(!punyaPisau) { tampilkanModal("Eitss!", "Ambil dulu pisau di bawah kuenya untuk memotong!"); return; }
+            
+            document.getElementById('garis-potong').style.background = 'solid white';
+            tampilkanModal("🍰 Cake Cut!", "Kue berhasil dipotong! Wah ternyata Di dalam kue ini ada surat rahasia buat kamu looh!", function() {
+                changeScreen('screen-kue', 'screen-surat');
+            });
+        }
+
+        // --- SCREEN 3 ---
+        function actionSurat() {
+            document.getElementById('amplop').style.display = 'none';
+            document.getElementById('kotak-surat').style.display = 'block';
+        }
+        function goToGallery() {
+            changeScreen('screen-surat', 'screen-galeri');
+        }
+        function goToGame() {
+            changeScreen('screen-galeri', 'screen-game');
+            mulaiMiniGame();
+        }
+
+        // --- SCREEN 4 (MINI GAME) ---
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let skor = 0; let gameActive = false;
+        let basket = { x: 175, y: 370, width: 60, height: 15 };
+        let items = [];
+
+        function mulaiMiniGame() {
+            gameActive = true; items = []; skor = 0;
+            document.getElementById('skor-txt').innerText = skor;
+            window.addEventListener('mousemove', (e) => {
+                let rect = canvas.getBoundingClientRect();
+                basket.x = e.clientX - rect.left - basket.width/2;
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                let rect = canvas.getBoundingClientRect();
+                basket.x = e.touches[0].clientX - rect.left - basket.width/2;
+            });
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop() {
+            if(!gameActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(Math.random() < 0.03) {
+                let isGood = Math.random() > 0.35;
+                items.push({ x: Math.random() * (canvas.width - 20), y: 0, speed: 3 + Math.random()*2, isGood: isGood });
+            }
+
+            ctx.fillStyle = '#c39b56';
+            ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+
+            for(let i = items.length - 1; i >= 0; i--) {
+                let item = items[i]; item.y += item.speed;
+                ctx.beginPath(); ctx.arc(item.x + 10, item.y + 10, 10, 0, Math.PI * 2);
+                ctx.fillStyle = item.isGood ? '#ff477e' : '#ff0000'; ctx.fill();
+
+                if(item.y + 20 >= basket.y && item.x >= basket.x && item.x <= basket.x + basket.width) {
+                    if(item.isGood) {
+                        skor++;
+                        document.getElementById('skor-txt').innerText = skor;
+                    } else {
+                        skor = Math.max(0, skor - 2); 
+                        document.getElementById('skor-txt').innerText = skor;
+                        gameActive = false; // pause game sebentar pas modal muncul
+                        tampilkanModal("Waduh! 😜", "Kamu kena bola MERAH, skor dikurangi -2!", function() {
+                            gameActive = true;
+                            requestAnimationFrame(gameLoop);
+                        });
+                    }
+                    items.splice(i, 1);
+                    
+                    if(skor >= 10) {
+                        gameActive = false;
+                        tampilkanModal("🎉 Hore!", "Kamu berhasil mengumpulkan 10 skor. Mari kita ambil kado ulang tahunmu!", function() {
+                            changeScreen('screen-game', 'screen-kado');
+                        });
+                    }
+                    continue;
+                }
+                if(item.y > canvas.height) items.splice(i, 1);
+            }
+            if(gameActive) requestAnimationFrame(gameLoop);
+        }
+
+        // --- SCREEN 5 ---
+        const tombolMahal = document.getElementById('btn-mahal');
+        function kabur() {
+            const maxX = window.innerWidth - tombolMahal.offsetWidth - 40;
+            const maxY = window.innerHeight - tombolMahal.offsetHeight - 40;
+            tombolMahal.style.position = 'fixed';
+            tombolMahal.style.left = `${Math.random() * maxX}px`;
+            tombolMahal.style.top = `${Math.random() * maxY}px`;
+        }
+
+        function actionAkhir() {
+            tampilkanModal("💎 KADO DIKLAIM!", "<b>PILIHAN YANG SANGAT BIJAK & HEMAT SEKALI!</b><br><br>Selamat Ulang Tahun, Teh Azul! Walaupun kamu gak mau pilih kado yang mahal tapi...... ditunggu kadonya ya tar di anter sama amang paket! Hahaha 🤪🎁<br><br>Enjoy your day! 🎂🔥");
+        }
+    </script>
+</body>
+</html>
